@@ -13,9 +13,11 @@ import (
 )
 
 func main() {
-	viper.SetConfigFile("path-to-file-env")
-	viper.ReadInConfig()
-
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Failed to read config file: ", err)
+	}
+	log.Println("Loaded config:", viper.AllSettings())
 	port := viper.Get("PORT").(string)
 	dbUrl := viper.Get("DB_URL").(string)
 
@@ -28,5 +30,5 @@ func main() {
 	bookService := service.NewBookService(bookRepo)
 	bookHandler := handler.NewBookHandler(bookService)
 	routes.RegisterBookRoutes(router, bookHandler)
-	router.Run(port)
+	router.Run(":" + port)
 }
