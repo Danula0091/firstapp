@@ -32,17 +32,18 @@ func (r *BookRepository) GetBooks(title, author, description string) ([]*model.B
 	var books []*model.Book
 	query := r.db.Model(&model.Book{})
 	if title != "" {
-		query = query.Where("title = ?", title)
+		query = query.Where("title LIKE ?", "%"+title+"%")
 	}
 	if author != "" {
-		query = query.Where("author = ?", author)
+		query = query.Where("author LIKE ?", "%"+author+"%")
 	}
 	if description != "" {
-		query = query.Where("description LIKE '%" + description + "%'")
+		query = query.Where("description LIKE ?", "%"+description+"%")
 	}
 	if err := query.Find(&books).Error; err != nil {
 		return nil, err
 	}
+	log.Println("Executing query:", query.Statement.SQL.String())
 	return books, nil
 }
 func (r *BookRepository) GetBook(id uint) (*model.Book, error) {
